@@ -1,0 +1,13 @@
+anchor_id,friendly_label,zone
+SYR-OFFICE-DRAWER-BOTTOMLEFT,"Office: Bottom-left drawer",Home
+SYR-KITCHEN-JUNKDRAWER,"Kitchen: Junk drawer",Home
+SYR-LAUNDRY-BASKET-A,"Laundry: Basket A",Home
+SYR-GARAGE-TOOLBOX-01,"Garage: Toolbox 01 (top)",Home
+SYR-GARAGE-TOOLBOX-02,"Garage: Toolbox 02 (bottom)",Home
+GOUV-SHED-PAINT-SHELF,"Gouverneur: Shed paint shelf",Gouverneur
+GOUV-FEED-BAG-STACK,"Gouverneur: Feed bag stack",Gouverneur
+HOME-PILL-FILE-JILLIAN,"Jillian: Pill file",Relationships
+HOME-DAD-MEMO-BOX,"Dad: Memo box",Dad
+HOME-FAMILY-BIRTHDAY-CARD,"Family: Birthday card stash",Family
+HOME-PROJECTS-3D-PLA-FILAMENT,"Projects: PLA filament",Projects
+HOME-CROSSPOLL-SHELF,"Cross-pollination shelf",Cross-Pollination
