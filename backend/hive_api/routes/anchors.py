@@ -44,12 +44,13 @@ def create_or_update_anchor(
     anchor = (
         session.query(models.Anchor).filter(models.Anchor.anchor_id == anchor_id).first()
     )
+    payload_data = payload.dict(exclude={"anchor_id"})
     if anchor:
-        for field, value in payload.dict().items():
+        for field, value in payload_data.items():
             setattr(anchor, field, value)
         session.add(anchor)
     else:
-        anchor = models.Anchor(**payload.dict(), anchor_id=anchor_id)
+        anchor = models.Anchor(anchor_id=anchor_id, **payload_data)
         session.add(anchor)
     session.commit()
     session.refresh(anchor)
