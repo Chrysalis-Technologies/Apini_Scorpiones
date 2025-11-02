@@ -3,6 +3,8 @@ import { useEffect } from 'react'
 
 import { CaptureButton } from '../components/CaptureButton'
 import { HiveMap } from '../components/HiveMap'
+import { SprintCalendar } from '../components/SprintCalendar'
+import { WeatherWidget } from '../components/WeatherWidget'
 import { useHiveStore } from '../state/useHiveStore'
 
 export function CommandCenterPage() {
@@ -17,6 +19,19 @@ export function CommandCenterPage() {
 
   return (
     <div>
+      <div
+        className="page-container"
+        style={{
+          display: 'grid',
+          gap: '1.5rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          alignItems: 'stretch',
+        }}
+      >
+        <WeatherWidget />
+        <SprintCalendar />
+      </div>
+
       <section style={{ display: 'flex', justifyContent: 'space-between', padding: '2rem' }}>
         <div>
           <h1 style={{ marginBottom: '0.25rem' }}>Command Center</h1>
