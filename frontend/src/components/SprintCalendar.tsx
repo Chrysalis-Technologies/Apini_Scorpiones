@@ -5,11 +5,7 @@ type CalendarDay = {
   isToday: boolean
 }
 
-const WEEK_LABELS = [
-  'Current Sprint — Week 1',
-  'Current Sprint — Week 2',
-  'Next Sprint — Week 1',
-]
+const WEEK_LABELS = ['Current Sprint — Week 1', 'Current Sprint — Week 2', 'Next Sprint — Week 1']
 
 function startOfWeek(date: Date) {
   const result = new Date(date)
@@ -59,10 +55,7 @@ export function SprintCalendar() {
   }, [today])
 
   return (
-    <div
-      className="card"
-      style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
-    >
+    <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <div>
         <h2 style={{ margin: '0 0 0.25rem 0' }}>Sprint Calendar</h2>
         <p style={{ margin: 0, opacity: 0.7, fontSize: '0.9rem' }}>
@@ -70,72 +63,64 @@ export function SprintCalendar() {
         </p>
       </div>
 
-      <div style={{ overflowX: 'auto', paddingBottom: '0.25rem' }}>
-        <div
-          style={{
-            display: 'grid',
-            gap: '1rem',
-            gridTemplateColumns: 'repeat(14, minmax(72px, 1fr))',
-            gridAutoRows: 'minmax(0, auto)',
-            minWidth: '720px',
-          }}
-        >
-          {weeks.map((week, index) => {
-            const gridColumn = index === 0 ? '1 / span 7' : '8 / span 7'
-            const gridRow = index === 2 ? '2' : '1'
-            const rangeLabel = formatDateRange(week[0].date, week[6].date)
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        {weeks.map((week, index) => {
+          const rangeLabel = formatDateRange(week[0].date, week[6].date)
 
-            return (
+          return (
+            <section
+              key={index}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.85rem',
+                padding: '1.25rem',
+                borderRadius: '16px',
+                border: '1px solid rgba(18, 21, 31, 0.08)',
+                background: 'rgba(245, 246, 251, 0.8)',
+              }}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <span style={{ fontWeight: 600 }}>{WEEK_LABELS[index]}</span>
+                <span style={{ fontSize: '0.9rem', opacity: 0.65 }}>{rangeLabel}</span>
+              </div>
+
               <div
-                key={index}
                 style={{
-                  gridColumn,
-                  gridRow,
-                  display: 'flex',
-                  flexDirection: 'column',
+                  display: 'grid',
                   gap: '0.75rem',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
                 }}
               >
-                <div>
-                  <div style={{ fontWeight: 600 }}>{WEEK_LABELS[index]}</div>
-                  <div style={{ fontSize: '0.85rem', opacity: 0.65 }}>{rangeLabel}</div>
-                </div>
-                <div
-                  style={{
-                    display: 'grid',
-                    gap: '0.5rem',
-                    gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
-                  }}
-                >
-                  {week.map((day: CalendarDay) => (
-                    <div
-                      key={day.date.toISOString()}
-                      style={{
-                        borderRadius: '12px',
-                        border: day.isToday
-                          ? '1px solid rgba(255, 159, 28, 0.75)'
-                          : '1px solid rgba(18, 21, 31, 0.08)',
-                        padding: '0.75rem 0.5rem',
-                        textAlign: 'center',
-                        background: day.isToday ? '#fff3e0' : '#f5f6fb',
-                        color: '#1d1f2f',
-                      }}
-                    >
-                      <div style={{ fontSize: '0.75rem', opacity: 0.7 }}>
-                        {day.date.toLocaleDateString(undefined, {
-                          weekday: 'short',
-                        })}
-                      </div>
-                      <div style={{ fontSize: '1.1rem', fontWeight: 600 }}>
-                        {day.date.getDate()}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                {week.map((day: CalendarDay) => (
+                  <div
+                    key={day.date.toISOString()}
+                    style={{
+                      borderRadius: '12px',
+                      border: day.isToday
+                        ? '1px solid rgba(255, 159, 28, 0.75)'
+                        : '1px solid rgba(18, 21, 31, 0.08)',
+                      padding: '0.85rem',
+                      background: day.isToday ? '#fff3e0' : '#ffffff',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.35rem',
+                    }}
+                  >
+                    <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>
+                      {day.date.toLocaleDateString(undefined, {
+                        weekday: 'short',
+                      })}
+                    </span>
+                    <span style={{ fontSize: '1.4rem', fontWeight: 600 }}>
+                      {day.date.getDate()}
+                    </span>
+                  </div>
+                ))}
               </div>
-            )
-          })}
-        </div>
+            </section>
+          )
+        })}
       </div>
     </div>
   )
