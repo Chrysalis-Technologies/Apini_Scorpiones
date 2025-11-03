@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { Fragment, useMemo } from 'react'
 
 import {
   describeWeather,
@@ -20,17 +20,19 @@ type HourlyOutlookProps = {
   weatherState: WeatherDataResult
 }
 
-type HourlyRow = {
+type HourlyColumn = {
   isoTime: string
   label: string
   calendarNote: string
-  weatherByLocation: Array<{
-    label: string
+  weatherByLocation: Record<
+    string,
+    {
     temperature: number | null
     precipitationProbability: number | null
     timeZone: string
     weatherCode: number | null
-  }>
+  }
+  >
 }
 
 function getCalendarNote(date: Date) {
@@ -41,7 +43,7 @@ export function HourlyOutlook({ weatherState }: HourlyOutlookProps) {
   const { weather, loading, error, locations } = weatherState
   const primaryLocation = locations[0]
 
-  const rows = useMemo<HourlyRow[]>(() => {
+  const columns = useMemo<HourlyColumn[]>(() => {
     const primaryWeather = weather[primaryLocation.label]
     if (!primaryWeather) {
       return []
@@ -54,7 +56,6 @@ export function HourlyOutlook({ weatherState }: HourlyOutlookProps) {
         const locationWeather = weather[location.label]
         if (!locationWeather) {
           return {
-            label: location.label,
             temperature: null,
             precipitationProbability: null,
             timeZone: primaryWeather.timeZone,
@@ -67,7 +68,6 @@ export function HourlyOutlook({ weatherState }: HourlyOutlookProps) {
           locationWeather.hourly[index]
 
         return {
-          label: location.label,
           temperature: match ? match.temperature : null,
           precipitationProbability: match ? match.precipitationProbability : null,
           timeZone: locationWeather.timeZone,
@@ -79,7 +79,10 @@ export function HourlyOutlook({ weatherState }: HourlyOutlookProps) {
         isoTime: hour.time,
         label: formatHourLabel(hour.time, primaryWeather.timeZone),
         calendarNote: getCalendarNote(date),
-        weatherByLocation,
+        weatherByLocation: locations.reduce<HourlyColumn['weatherByLocation']>((acc, location, locationIndex) => {
+          acc[location.label] = weatherByLocation[locationIndex]
+          return acc
+        }, {}),
       }
     })
   }, [locations, weather, primaryLocation.label])
@@ -95,57 +98,87 @@ export function HourlyOutlook({ weatherState }: HourlyOutlookProps) {
         <p style={{ margin: 0 }}>{error}</p>
       ) : loading ? (
         <p style={{ margin: 0, opacity: 0.7 }}>Fetching the latest forecast…</p>
-      ) : rows.length === 0 ? (
+      ) : columns.length === 0 ? (
         <p style={{ margin: 0, opacity: 0.7 }}>Weather data unavailable right now.</p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div style={{ overflowX: 'auto', paddingBottom: '0.5rem' }}>
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: `110px 1fr repeat(${locations.length}, minmax(150px, 0.8fr))`,
+              gridTemplateColumns: `150px repeat(${columns.length}, minmax(150px, 1fr))`,
               gap: '0.75rem',
-              fontSize: '0.85rem',
-              opacity: 0.7,
+              alignItems: 'stretch',
             }}
           >
-            <span>Time</span>
-            <span>Calendar</span>
-            {locations.map((location) => (
-              <span key={location.label}>{location.label}</span>
+            <div style={{ opacity: 0.6, fontSize: '0.85rem' }}>Time</div>
+            {columns.map((column) => (
+              <div
+                key={`time-${column.isoTime}`}
+                style={{ textAlign: 'center', fontWeight: 600, fontSize: '1rem' }}
+              >
+                {column.label}
+              </div>
             ))}
-          </div>
 
-          {rows.map((row) => (
-            <div
-              key={row.isoTime}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: `110px 1fr repeat(${row.weatherByLocation.length}, minmax(150px, 0.8fr))`,
-                gap: '0.75rem',
-                alignItems: 'center',
-                padding: '0.75rem 1rem',
-                borderRadius: '16px',
-                border: '1px solid rgba(18, 21, 31, 0.08)',
-                background: 'rgba(245, 246, 251, 0.8)',
-              }}
-            >
-              <strong>{row.label}</strong>
-              <span style={{ fontWeight: 500 }}>{row.calendarNote}</span>
-              {row.weatherByLocation.map((item) => (
-                <span
-                  key={item.label}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.25rem',
-                    fontSize: '0.95rem',
-                  }}
-                >
-                  {item.temperature === null ? (
-                    <span style={{ opacity: 0.6 }}>–</span>
-                  ) : (
-                    <>
-                      <span style={{ fontWeight: 600 }}>{Math.round(item.temperature)}°</span>
+            <div style={{ fontWeight: 600 }}>Calendar</div>
+            {columns.map((column) => (
+              <div
+                key={`calendar-${column.isoTime}`}
+                style={{
+                  padding: '0.85rem',
+                  borderRadius: '14px',
+                  background: 'rgba(245, 246, 251, 0.9)',
+                  border: '1px solid rgba(18, 21, 31, 0.08)',
+                  fontWeight: 500,
+                }}
+              >
+                {column.calendarNote}
+              </div>
+            ))}
+
+            {locations.map((location) => (
+              <Fragment key={location.label}>
+                <div style={{ fontWeight: 600 }}>{location.label}</div>
+                {columns.map((column) => {
+                  const item = column.weatherByLocation[location.label]
+
+                  if (!item || item.temperature === null) {
+                    return (
+                      <div
+                        key={`${location.label}-${column.isoTime}`}
+                        style={{
+                          padding: '0.85rem',
+                          borderRadius: '14px',
+                          border: '1px dashed rgba(18, 21, 31, 0.15)',
+                          background: '#fff',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          opacity: 0.6,
+                          fontSize: '0.9rem',
+                        }}
+                      >
+                        —
+                      </div>
+                    )
+                  }
+
+                  return (
+                    <div
+                      key={`${location.label}-${column.isoTime}`}
+                      style={{
+                        padding: '0.85rem',
+                        borderRadius: '14px',
+                        background: '#fff',
+                        border: '1px solid rgba(18, 21, 31, 0.08)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.4rem',
+                      }}
+                    >
+                      <span style={{ fontSize: '1.35rem', fontWeight: 650 }}>
+                        {Math.round(item.temperature)}°
+                      </span>
                       <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>
                         {item.precipitationProbability === null
                           ? '—'
@@ -154,12 +187,12 @@ export function HourlyOutlook({ weatherState }: HourlyOutlookProps) {
                       <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>
                         {item.weatherCode === null ? '' : describeWeather(item.weatherCode)}
                       </span>
-                    </>
-                  )}
-                </span>
-              ))}
-            </div>
-          ))}
+                    </div>
+                  )
+                })}
+              </Fragment>
+            ))}
+          </div>
         </div>
       )}
     </section>
