@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from hive_api.db import create_all
 from hive_api.routes.anchors import router as anchors_router
 from hive_api.routes.breadcrumbs import router as breadcrumbs_router
+from hive_api.routes.calendar import router as calendar_router
 from hive_api.routes.captures import router as captures_router
 from hive_api.routes.items import router as items_router
 from hive_api.routes.routesets import router as routesets_router
@@ -43,3 +44,4 @@ app.include_router(breadcrumbs_router, prefix="/api/breadcrumbs", tags=["breadcr
 app.include_router(routesets_router, prefix="/api/routesets", tags=["routesets"])
 app.include_router(scans_router, prefix="/api/scan", tags=["scans"])
 app.include_router(search_router, prefix="/api/search", tags=["search"])
+app.include_router(calendar_router, prefix="/api/calendar", tags=["calendar"])

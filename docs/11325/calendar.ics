@@ -1,0 +1,44 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Praetorium Sample//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:sample-event-1@praetorium
+DTSTAMP:20230918T150000Z
+DTSTART;TZID=America/Chicago:20230925T090000
+DTEND;TZID=America/Chicago:20230925T100000
+SUMMARY:Team Standup
+DESCRIPTION:Daily check-in with the home operations team.
+LOCATION:Home Office
+END:VEVENT
+BEGIN:VEVENT
+UID:sample-event-2@praetorium
+DTSTAMP:20230918T150000Z
+DTSTART;VALUE=DATE:20230928
+DTEND;VALUE=DATE:20230929
+SUMMARY:Household Planning Day
+DESCRIPTION:Plan out projects and errands for the upcoming week.
+END:VEVENT
+BEGIN:VEVENT
+UID:sample-event-3@praetorium
+DTSTAMP:20230918T150000Z
+DTSTART;TZID=America/Chicago:20230930T183000
+DTEND;TZID=America/Chicago:20230930T203000
+SUMMARY:Dinner with Friends
+LOCATION:Downtown Bistro
+END:VEVENT
+BEGIN:VTODO
+UID:sample-reminder-1@praetorium
+DTSTAMP:20230918T150000Z
+DUE;TZID=America/Chicago:20230924T170000
+SUMMARY:Submit expense report
+DESCRIPTION:Wrap up receipts from the recent hardware purchases.
+STATUS:NEEDS-ACTION
+END:VTODO
+BEGIN:VTODO
+UID:sample-reminder-2@praetorium
+DTSTAMP:20230918T150000Z
+SUMMARY:Water the garden
+STATUS:NEEDS-ACTION
+END:VTODO
+END:VCALENDAR
