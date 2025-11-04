@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { CaptureButton } from '../components/CaptureButton'
 import { HiveMap } from '../components/HiveMap'
 import { HourlyOutlook } from '../components/HourlyOutlook'
+import { LatestUpdatesCard } from '../components/LatestUpdatesCard'
 import { SprintCalendar } from '../components/SprintCalendar'
 import { WeatherWidget } from '../components/WeatherWidget'
 import { useWeatherData } from '../hooks/useWeatherData'
@@ -26,6 +27,7 @@ export function CommandCenterPage() {
         <HourlyOutlook weatherState={weatherState} />
         <SprintCalendar />
         <WeatherWidget weatherState={weatherState} />
+        <LatestUpdatesCard />
 
         <section
           className="card"
