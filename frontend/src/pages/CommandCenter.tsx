@@ -1,67 +1,94 @@
+import { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { useEffect } from 'react'
+import { hiveApi } from "../api/client";
+import { MapView } from "../components/MapView";
+import { useAppState } from "../context/AppState";
 
-import { CaptureButton } from '../components/CaptureButton'
-import { HiveMap } from '../components/HiveMap'
-import { HourlyOutlook } from '../components/HourlyOutlook'
-import { LatestUpdatesCard } from '../components/LatestUpdatesCard'
-import { SprintCalendar } from '../components/SprintCalendar'
-import { WeatherWidget } from '../components/WeatherWidget'
-import { useWeatherData } from '../hooks/useWeatherData'
-import { useHiveStore } from '../state/useHiveStore'
+export function CommandCenter(): JSX.Element {
+  const { anchors, items, captures, refresh, setActiveAnchor } = useAppState();
+  const [captureText, setCaptureText] = useState("");
+  const navigate = useNavigate();
 
-export function CommandCenterPage() {
-  const captures = useHiveStore((state) => state.commandCaptures)
-  const loadZones = useHiveStore((state) => state.loadZones)
-  const loadCaptures = useHiveStore((state) => state.loadCaptures)
-  const weatherState = useWeatherData()
+  const inbox = items.filter((item) => item.status === "open").slice(0, 5);
 
-  useEffect(() => {
-    loadZones().catch(console.error)
-    loadCaptures().catch(console.error)
-  }, [loadZones, loadCaptures])
+  const handleCapture = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!captureText.trim()) {
+      return;
+    }
+    await hiveApi.createCapture(captureText.trim());
+    setCaptureText("");
+    await refresh();
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      <div className="page-container" style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
-        <HourlyOutlook weatherState={weatherState} />
-        <SprintCalendar />
-        <WeatherWidget weatherState={weatherState} />
-        <LatestUpdatesCard />
-
-        <section
-          className="card"
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '1.5rem',
-          }}
-        >
-          <div>
-            <h1 style={{ margin: '0 0 0.25rem 0' }}>Command Center</h1>
-            <p style={{ margin: 0, opacity: 0.75 }}>
-              Everything lands here first. Sort once a day, keep momentum the rest.
-            </p>
+    <section className="command-center">
+      <div className="card">
+        <header>
+          <h2>Quick Capture</h2>
+          <p>Drop loose thoughts here. Re-index later inside your zones.</p>
+        </header>
+        <form onSubmit={handleCapture} className="capture-form">
+          <textarea
+            placeholder="What's pulling your attention?"
+            value={captureText}
+            onChange={(event) => setCaptureText(event.target.value)}
+            rows={3}
+          />
+          <div className="actions">
+            <button type="submit">Save capture</button>
           </div>
-          <CaptureButton />
-        </section>
-
-        <section className="card">
-          <h2 style={{ marginTop: 0 }}>Inbox</h2>
-          <ul style={{ margin: 0, paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {captures.map((capture) => (
-              <li key={capture.id}>
-                <strong>{capture.source.toUpperCase()}</strong> — {capture.raw_text}
-              </li>
-            ))}
-            {!captures.length ? <li>Inbox clear.</li> : null}
-          </ul>
-        </section>
+        </form>
       </div>
 
-      <HiveMap />
-    </div>
-  )
+      <div className="grid">
+        <div className="card">
+          <header>
+            <h3>Inbox Highlights</h3>
+            <p>Five tasks to route into anchors.</p>
+          </header>
+          <ul>
+            {inbox.map((item) => (
+              <li key={item.id}>
+                <strong>{item.title}</strong>
+                {item.body && <p>{item.body}</p>}
+              </li>
+            ))}
+            {!inbox.length && <p>All clear. Capture something new.</p>}
+          </ul>
+        </div>
+
+        <div className="card">
+          <header>
+            <h3>Latest Captures</h3>
+            <p>Context from the last 24 hours.</p>
+          </header>
+          <ul>
+            {captures.slice(0, 5).map((capture) => (
+              <li key={capture.id}>
+                <span>{new Date(capture.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                <p>{capture.raw_text}</p>
+              </li>
+            ))}
+            {!captures.length && <p>Capture queue is empty.</p>}
+          </ul>
+        </div>
+      </div>
+
+      <div className="card">
+        <header>
+          <h3>Hive Map</h3>
+          <p>Physical anchors around you.</p>
+        </header>
+        <MapView
+          anchors={anchors}
+          onAnchorSelect={(anchor) => {
+            setActiveAnchor(anchor.id);
+            navigate(`/anchors/${anchor.anchor_id}`);
+          }}
+        />
+      </div>
+    </section>
+  );
 }

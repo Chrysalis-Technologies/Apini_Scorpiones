@@ -1,26 +1,32 @@
-# Hive Dashboard
+# Hive Dashboard MVP
 
-This workspace hosts the Hive dashboard MVP (FastAPI backend + React/Vite frontend) that mirrors spatial memory workflows with zones, anchors, and breadcrumbs.
+Hive Dashboard is a spatial-memory personal organization system that keeps every task, note, or breadcrumb tethered to a life **Zone** and its physical **Anchors**. The repository contains a FastAPI + PostgreSQL backend paired with a React + Vite + TypeScript PWA frontend. The goal is to let an interrupted workflow resume instantly by jumping back to the right anchor, zone, and breadcrumb context.
 
-- `backend/` — FastAPI application, SQLAlchemy models, Alembic migrations, seed helpers.
-- `frontend/` — React + Vite client with Hive map, zone + anchor views, and PWA shell.
-- `docs/` — planning blueprint, anchor seed CSV.
-- `scripts/seed.py` — helper to seed zones and anchors via the API.
+## Stack Overview
+- **Backend**: FastAPI, SQLAlchemy, Alembic, PostgreSQL, API-key auth
+- **Frontend**: React, Vite, TypeScript, Leaflet map shell, Installable PWA
+- **Infra**: Docker Compose (defined outside this increment) wires backend, frontend, and Postgres
 
-## Getting started
-
+## Running the Backend
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r backend/requirements.txt
-alembic -c backend/alembic.ini upgrade head
-uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
+cd backend
+alembic -c alembic.ini upgrade head
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
+The backend reads configuration from `.env` (see `.env.example`). API requests must include the `X-API-Key` header.
+
+## Running the Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Visit `http://localhost:5173` for the Hive map and `http://localhost:8000/docs` for the API explorer.
+The frontend expects `VITE_API_BASE_URL` and `VITE_API_KEY` in `.env` or the shell. It provides Command Center (`/`), Zone (`/zones/:zoneId`), and Anchor (`/anchors/:anchorId`) routes.
+
+## Docker Note
+Docker and docker-compose definitions exist or will be supplied separately. This increment focuses on application code; integrate the provided environment variables with your compose setup when available.
